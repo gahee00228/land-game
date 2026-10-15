@@ -2,6 +2,8 @@
 
 > 사용자(Player)와 컴퓨터(AI)가 맞붙는 실시간 영토 확장 보드게임! 👑 vs 🤖
 
+🔗 **Live Demo (Vercel 배포 URL)**: [https://land-game.vercel.app](https://land-game.vercel.app)
+
 ---
 
 ## 🎮 게임 소개
