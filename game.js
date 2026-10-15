@@ -282,28 +282,84 @@ class LandGame {
     this.modalPlayerScore = document.getElementById('modalPlayerScore');
     this.modalComputerScore = document.getElementById('modalComputerScore');
     this.modalRestartBtn = document.getElementById('modalRestartBtn');
+    this.modalHomeBtn = document.getElementById('modalHomeBtn');
 
-    // Intro & Rules Modal DOM
-    this.introModal = document.getElementById('introModal');
+    // Screen DOM
+    this.introScreen = document.getElementById('introScreen');
+    this.playScreen = document.getElementById('playScreen');
     this.startGameBtn = document.getElementById('startGameBtn');
-    this.introCloseBtn = document.getElementById('introCloseBtn');
-    this.rulesBtn = document.getElementById('rulesBtn');
+    this.homeBtn = document.getElementById('homeBtn');
+    this.introSoundBtn = document.getElementById('introSoundBtn');
 
-    // Size Selectors
-    this.sizeButtons = document.querySelectorAll('.size-btn');
+    // Rules Modal DOM
+    this.rulesBtn = document.getElementById('rulesBtn');
+    this.rulesModal = document.getElementById('rulesModal');
+    this.rulesCloseBtn = document.getElementById('rulesCloseBtn');
+
+    // Size Selectors (Intro & In-Game)
+    this.introSizeButtons = document.querySelectorAll('.intro-size-btn');
+    this.sizeButtons = document.querySelectorAll('#playScreen .size-btn');
 
     this.bindEvents();
+    // Initialize game board quietly in background
     this.startNewGame(this.gridSize);
   }
 
   bindEvents() {
-    // Sound Toggle
-    this.soundToggleBtn.addEventListener('click', () => {
+    // Sound Toggles (Sync both sound buttons)
+    const handleSoundToggle = () => {
       const isEnabled = this.sound.toggle();
-      const iconSpan = this.soundToggleBtn.querySelector('.icon');
-      iconSpan.textContent = isEnabled ? '🔊' : '🔇';
-      this.soundToggleBtn.title = isEnabled ? '소리 끄기' : '소리 켜기';
-    });
+      const icon = isEnabled ? '🔊' : '🔇';
+      const title = isEnabled ? '소리 끄기' : '소리 켜기';
+      if (this.soundToggleBtn) {
+        const iconSpan = this.soundToggleBtn.querySelector('.icon');
+        if (iconSpan) iconSpan.textContent = icon;
+        this.soundToggleBtn.title = title;
+      }
+      if (this.introSoundBtn) {
+        const iconSpan = this.introSoundBtn.querySelector('.icon');
+        if (iconSpan) iconSpan.textContent = icon;
+        this.introSoundBtn.title = title;
+      }
+    };
+
+    if (this.soundToggleBtn) this.soundToggleBtn.addEventListener('click', handleSoundToggle);
+    if (this.introSoundBtn) this.introSoundBtn.addEventListener('click', handleSoundToggle);
+
+    // Screen Transitions: Start Game & Go to Home/Intro
+    if (this.startGameBtn) {
+      this.startGameBtn.addEventListener('click', () => {
+        this.sound.init();
+        this.sound.playPlayerPop();
+        this.showPlayScreen();
+      });
+    }
+
+    if (this.homeBtn) {
+      this.homeBtn.addEventListener('click', () => {
+        this.showIntroScreen();
+      });
+    }
+
+    if (this.modalHomeBtn) {
+      this.modalHomeBtn.addEventListener('click', () => {
+        this.closeModal();
+        this.showIntroScreen();
+      });
+    }
+
+    // Rules Modal Events
+    if (this.rulesBtn) {
+      this.rulesBtn.addEventListener('click', () => this.openRulesModal());
+    }
+    if (this.rulesCloseBtn) {
+      this.rulesCloseBtn.addEventListener('click', () => this.closeRulesModal());
+    }
+    if (this.rulesModal) {
+      this.rulesModal.addEventListener('click', (e) => {
+        if (e.target === this.rulesModal) this.closeRulesModal();
+      });
+    }
 
     // Reset Buttons
     this.restartBtn.addEventListener('click', () => this.startNewGame(this.gridSize));
@@ -312,44 +368,32 @@ class LandGame {
       this.startNewGame(this.gridSize);
     });
 
-    // Intro & Rules Modal Events
-    if (this.startGameBtn) {
-      this.startGameBtn.addEventListener('click', () => {
-        this.sound.init();
-        this.sound.playPlayerPop();
-        this.closeIntroModal();
+    // Map Size Synchronization
+    const handleSizeSelect = (newSize) => {
+      if (!newSize) return;
+      this.gridSize = newSize;
+      this.introSizeButtons.forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.size, 10) === newSize);
       });
-    }
-
-    if (this.rulesBtn) {
-      this.rulesBtn.addEventListener('click', () => {
-        this.openIntroModal();
+      this.sizeButtons.forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.size, 10) === newSize);
       });
-    }
+      if (this.playScreen.classList.contains('active')) {
+        this.startNewGame(newSize);
+      }
+    };
 
-    if (this.introCloseBtn) {
-      this.introCloseBtn.addEventListener('click', () => {
-        this.closeIntroModal();
+    this.introSizeButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const size = parseInt(e.target.dataset.size, 10);
+        handleSizeSelect(size);
       });
-    }
+    });
 
-    if (this.introModal) {
-      this.introModal.addEventListener('click', (e) => {
-        if (e.target === this.introModal) {
-          this.closeIntroModal();
-        }
-      });
-    }
-
-    // Grid Size Selectors
     this.sizeButtons.forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const newSize = parseInt(e.target.dataset.size, 10);
-        if (newSize && newSize !== this.gridSize) {
-          this.sizeButtons.forEach(b => b.classList.remove('active'));
-          e.target.classList.add('active');
-          this.startNewGame(newSize);
-        }
+        const size = parseInt(e.target.dataset.size, 10);
+        handleSizeSelect(size);
       });
     });
   }
@@ -559,15 +603,31 @@ class LandGame {
     this.resultModal.classList.remove('show');
   }
 
-  openIntroModal() {
-    if (this.introModal) {
-      this.introModal.classList.add('show');
+  showPlayScreen() {
+    if (this.introScreen) this.introScreen.classList.remove('active');
+    if (this.playScreen) this.playScreen.classList.add('active');
+    this.closeModal();
+    this.closeRulesModal();
+    this.startNewGame(this.gridSize);
+  }
+
+  showIntroScreen() {
+    if (this.playScreen) this.playScreen.classList.remove('active');
+    if (this.introScreen) this.introScreen.classList.add('active');
+    this.closeModal();
+    this.closeRulesModal();
+    this.confetti.stop();
+  }
+
+  openRulesModal() {
+    if (this.rulesModal) {
+      this.rulesModal.classList.add('show');
     }
   }
 
-  closeIntroModal() {
-    if (this.introModal) {
-      this.introModal.classList.remove('show');
+  closeRulesModal() {
+    if (this.rulesModal) {
+      this.rulesModal.classList.remove('show');
     }
   }
 }

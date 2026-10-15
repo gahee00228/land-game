@@ -15,167 +15,239 @@
 </head>
 <body>
   <div class="game-wrapper">
-    <!-- Header -->
-    <header class="game-header">
-      <div class="logo-area">
-        <span class="logo-icon">🏰</span>
-        <h1 class="game-title">땅따먹기 <span class="highlight">배틀!</span></h1>
-      </div>
-      <div class="header-controls">
-        <button id="soundToggleBtn" class="icon-btn" aria-label="사운드 켜기/끄기" title="소리 켜기/끄기">
+
+    <!-- ============================================================
+         1. INTRO SCREEN (인트로 화면)
+    ============================================================ -->
+    <section class="screen-view active" id="introScreen" aria-label="게임 인트로 화면">
+      <!-- Intro Top Bar -->
+      <header class="intro-top-bar">
+        <div class="intro-brand">
+          <span class="logo-icon">🏰</span>
+          <span class="intro-brand-name">LAND BATTLE</span>
+        </div>
+        <button id="introSoundBtn" class="icon-btn" aria-label="사운드 켜기/끄기" title="소리 켜기/끄기">
           <span class="icon">🔊</span>
         </button>
-        <button id="rulesBtn" class="btn btn-secondary" title="게임 규칙 보기">
-          <span class="btn-icon">📖</span> 규칙
-        </button>
-        <button id="restartBtn" class="btn btn-secondary" title="게임 다시 시작">
-          <span class="btn-icon">🔄</span> 다시 시작
-        </button>
-      </div>
-    </header>
+      </header>
 
-    <!-- Score Board -->
-    <section class="scoreboard-section">
-      <!-- Player Card -->
-      <div class="score-card player-card active" id="playerCard">
-        <div class="avatar-badge">
-          <span class="avatar">👑</span>
-        </div>
-        <div class="score-info">
-          <span class="score-name">나 (플레이어)</span>
-          <div class="score-value-wrapper">
-            <span class="score-count" id="playerScore">0</span>
-            <span class="score-unit">칸</span>
+      <!-- Intro Hero Banner -->
+      <div class="intro-hero-box">
+        <span class="intro-pill-badge">✨ 1:1 실시간 영토 확장 전략 대전</span>
+        <h1 class="intro-main-title">
+          땅따먹기 <span class="highlight">배틀!</span>
+        </h1>
+        <p class="intro-main-subtitle">
+          플레이어(👑)와 인공지능(🤖)의 두뇌 싸움! 빈 칸을 점령해 더 넓은 왕국을 건설하세요.
+        </p>
+
+        <!-- 3D Game Illustration Art -->
+        <div class="intro-art-container">
+          <img src="assets/intro-banner.jpg" alt="땅따먹기 배틀 3D 캐릭터 대전 일러스트" class="intro-art-img">
+          <div class="intro-art-tag">
+            <span class="tag-player">👑 나 (플레이어)</span>
+            <span class="tag-vs">VS</span>
+            <span class="tag-ai">🤖 컴퓨터 (AI)</span>
           </div>
         </div>
-        <div class="turn-indicator player-turn-tag">내 차례!</div>
       </div>
 
-      <!-- VS Badge & Board Stats -->
-      <div class="center-stat-board">
-        <div class="vs-badge">VS</div>
-        <div class="remain-tag">
-          남은 땅: <strong id="remainCellsCount">25</strong>칸
-        </div>
-      </div>
-
-      <!-- Computer Card -->
-      <div class="score-card computer-card" id="computerCard">
-        <div class="avatar-badge">
-          <span class="avatar">🤖</span>
-        </div>
-        <div class="score-info">
-          <span class="score-name">컴퓨터 (AI)</span>
-          <div class="score-value-wrapper">
-            <span class="score-count" id="computerScore">0</span>
-            <span class="score-unit">칸</span>
-          </div>
-        </div>
-        <div class="turn-indicator computer-turn-tag">생각 중...</div>
-      </div>
-    </section>
-
-    <!-- Progress Bar (Territory Occupation Rate) -->
-    <div class="progress-bar-container">
-      <div class="progress-fill player-fill" id="playerProgressBar" style="width: 0%;"></div>
-      <div class="progress-fill neutral-fill" id="neutralProgressBar" style="width: 100%;"></div>
-      <div class="progress-fill computer-fill" id="computerProgressBar" style="width: 0%;"></div>
-    </div>
-
-    <!-- Turn Message Banner -->
-    <div class="turn-banner" id="turnBanner">
-      <span class="turn-dot"></span>
-      <span class="turn-message" id="turnText">원하는 빈 칸을 터치하여 땅을 차지하세요! ✨</span>
-    </div>
-
-    <!-- Board Settings & Grid Size Options -->
-    <div class="grid-size-selector">
-      <span class="selector-label">맵 크기:</span>
-      <div class="size-options">
-        <button class="size-btn" data-size="4">4 × 4</button>
-        <button class="size-btn active" data-size="5">5 × 5</button>
-        <button class="size-btn" data-size="6">6 × 6</button>
-      </div>
-    </div>
-
-    <!-- Game Board Container -->
-    <main class="board-wrapper">
-      <div class="board-frame">
-        <div class="game-board" id="gameBoard" style="--grid-size: 5;">
-          <!-- Cells will be generated dynamically by JavaScript -->
-        </div>
-      </div>
-    </main>
-
-    <!-- Footer Guide -->
-    <footer class="game-footer">
-      <p class="guide-text">💡 규칙: 플레이어 점수가 높으면 승리, 낮으면 패배, 같을 때만 무승부로 판정됩니다.</p>
-    </footer>
-  </div>
-
-  <!-- Intro & Rules Modal Screen -->
-  <div class="modal-overlay intro-overlay show" id="introModal" role="dialog" aria-modal="true" aria-labelledby="introTitle">
-    <div class="intro-card">
-      <button class="intro-close-btn" id="introCloseBtn" aria-label="닫기" title="닫기">✕</button>
-      
-      <div class="intro-header">
-        <span class="intro-badge">✨ 1:1 실시간 영토 확장 대전</span>
-        <h2 class="intro-title" id="introTitle">
-          🏰 땅따먹기 <span class="highlight">배틀!</span>
-        </h2>
-        <p class="intro-subtitle">한 칸씩 땅을 차지하여 나만의 왕국을 더 크게 건설하세요!</p>
-      </div>
-
-      <div class="intro-media-wrapper">
-        <img src="assets/intro-banner.jpg" alt="땅따먹기 배틀 플레이어와 AI 캐릭터 보드게임 대전" class="intro-banner-img">
-        <div class="intro-media-tag">
-          <span class="tag-player">👑 플레이어</span>
-          <span class="tag-vs">VS</span>
-          <span class="tag-ai">🤖 AI 컴퓨터</span>
-        </div>
-      </div>
-
-      <!-- Quick Rules -->
-      <div class="intro-rules-box">
-        <h3 class="rules-box-title">📜 간단한 게임 규칙</h3>
+      <!-- Quick Game Rules Cards -->
+      <div class="intro-rules-section">
+        <h2 class="rules-section-title">📜 간단한 게임 규칙</h2>
         <div class="rules-grid">
           <div class="rule-card">
             <div class="rule-icon rule-icon-flag">🚩</div>
             <div class="rule-text-group">
-              <strong class="rule-step">1. 영토 차지</strong>
-              <p class="rule-detail">내 턴에 원하는 빈 칸을 터치하여 나의 영토로 만드세요.</p>
+              <strong class="rule-step">1. 영토 점령</strong>
+              <p class="rule-detail">내 차례에 원하는 빈 칸을 터치하여 깃발을 꽂고 영토를 확보합니다.</p>
             </div>
           </div>
 
           <div class="rule-card">
             <div class="rule-icon rule-icon-bot">🤖</div>
             <div class="rule-text-group">
-              <strong class="rule-step">2. AI 반격</strong>
-              <p class="rule-detail">컴퓨터가 빈 영토 중 하나를 골라 맞대응합니다.</p>
+              <strong class="rule-step">2. AI 컴퓨터 반격</strong>
+              <p class="rule-detail">턴이 넘어가면 컴퓨터가 빈 영토 중 하나를 지능적으로 차지합니다.</p>
             </div>
           </div>
 
           <div class="rule-card">
-            <div class="rule-icon rule-icon-crown">👑</div>
+            <div class="rule-icon rule-icon-crown">🏆</div>
             <div class="rule-text-group">
               <strong class="rule-step">3. 승리 조건</strong>
-              <p class="rule-detail">모든 땅이 채워졌을 때 더 많은 칸을 차지하면 승리!</p>
+              <p class="rule-detail">모든 땅이 채워졌을 때 더 많은 칸을 차지한 쪽이 최종 승리합니다!</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Intro Actions -->
-      <div class="intro-actions">
-        <button id="startGameBtn" class="btn btn-primary btn-large btn-glow intro-start-btn">
+      <!-- Map Size Selection on Intro Screen -->
+      <div class="intro-options-section">
+        <span class="selector-label">🗺️ 맵 크기 선택:</span>
+        <div class="size-options" id="introSizeOptions">
+          <button class="size-btn intro-size-btn" data-size="4">4 × 4 (스피드)</button>
+          <button class="size-btn intro-size-btn active" data-size="5">5 × 5 (기본)</button>
+          <button class="size-btn intro-size-btn" data-size="6">6 × 6 (대형)</button>
+        </div>
+      </div>
+
+      <!-- Start Button Action -->
+      <div class="intro-action-container">
+        <button id="startGameBtn" class="btn btn-primary btn-large btn-glow intro-cta-btn">
           <span class="btn-icon">🚀</span> 게임 시작하기!
+        </button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         2. PLAY SCREEN (게임 플레이 화면)
+    ============================================================ -->
+    <section class="screen-view" id="playScreen" aria-label="게임 플레이 화면">
+      <!-- Header -->
+      <header class="game-header">
+        <div class="logo-area">
+          <span class="logo-icon">🏰</span>
+          <h1 class="game-title">땅따먹기 <span class="highlight">배틀!</span></h1>
+        </div>
+        <div class="header-controls">
+          <button id="homeBtn" class="btn btn-secondary" title="인트로 화면으로 이동">
+            <span class="btn-icon">🏠</span> 인트로
+          </button>
+          <button id="rulesBtn" class="btn btn-secondary" title="게임 규칙 보기">
+            <span class="btn-icon">📖</span> 규칙
+          </button>
+          <button id="soundToggleBtn" class="icon-btn" aria-label="사운드 켜기/끄기" title="소리 켜기/끄기">
+            <span class="icon">🔊</span>
+          </button>
+          <button id="restartBtn" class="btn btn-secondary" title="게임 다시 시작">
+            <span class="btn-icon">🔄</span> 다시
+          </button>
+        </div>
+      </header>
+
+      <!-- Score Board -->
+      <section class="scoreboard-section">
+        <!-- Player Card -->
+        <div class="score-card player-card active" id="playerCard">
+          <div class="avatar-badge">
+            <span class="avatar">👑</span>
+          </div>
+          <div class="score-info">
+            <span class="score-name">나 (플레이어)</span>
+            <div class="score-value-wrapper">
+              <span class="score-count" id="playerScore">0</span>
+              <span class="score-unit">칸</span>
+            </div>
+          </div>
+          <div class="turn-indicator player-turn-tag">내 차례!</div>
+        </div>
+
+        <!-- VS Badge & Board Stats -->
+        <div class="center-stat-board">
+          <div class="vs-badge">VS</div>
+          <div class="remain-tag">
+            남은 땅: <strong id="remainCellsCount">25</strong>칸
+          </div>
+        </div>
+
+        <!-- Computer Card -->
+        <div class="score-card computer-card" id="computerCard">
+          <div class="avatar-badge">
+            <span class="avatar">🤖</span>
+          </div>
+          <div class="score-info">
+            <span class="score-name">컴퓨터 (AI)</span>
+            <div class="score-value-wrapper">
+              <span class="score-count" id="computerScore">0</span>
+              <span class="score-unit">칸</span>
+            </div>
+          </div>
+          <div class="turn-indicator computer-turn-tag">생각 중...</div>
+        </div>
+      </section>
+
+      <!-- Progress Bar (Territory Occupation Rate) -->
+      <div class="progress-bar-container">
+        <div class="progress-fill player-fill" id="playerProgressBar" style="width: 0%;"></div>
+        <div class="progress-fill neutral-fill" id="neutralProgressBar" style="width: 100%;"></div>
+        <div class="progress-fill computer-fill" id="computerProgressBar" style="width: 0%;"></div>
+      </div>
+
+      <!-- Turn Message Banner -->
+      <div class="turn-banner" id="turnBanner">
+        <span class="turn-dot"></span>
+        <span class="turn-message" id="turnText">원하는 빈 칸을 터치하여 땅을 차지하세요! ✨</span>
+      </div>
+
+      <!-- Board Settings & Grid Size Options -->
+      <div class="grid-size-selector">
+        <span class="selector-label">맵 크기:</span>
+        <div class="size-options">
+          <button class="size-btn" data-size="4">4 × 4</button>
+          <button class="size-btn active" data-size="5">5 × 5</button>
+          <button class="size-btn" data-size="6">6 × 6</button>
+        </div>
+      </div>
+
+      <!-- Game Board Container -->
+      <main class="board-wrapper">
+        <div class="board-frame">
+          <div class="game-board" id="gameBoard" style="--grid-size: 5;">
+            <!-- Cells will be generated dynamically by JavaScript -->
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer Guide -->
+      <footer class="game-footer">
+        <p class="guide-text">💡 규칙: 플레이어 점수가 높으면 승리, 낮으면 패배, 같을 때만 무승부로 판정됩니다.</p>
+      </footer>
+    </section>
+
+  </div>
+
+  <!-- Rules In-Game Modal -->
+  <div class="modal-overlay" id="rulesModal" role="dialog" aria-modal="true" aria-labelledby="rulesModalTitle">
+    <div class="modal-card">
+      <div class="modal-confetti">📖</div>
+      <h2 class="modal-title" id="rulesModalTitle">게임 방법 & 규칙</h2>
+      <p class="modal-desc">간단한 3가지 규칙으로 진행됩니다.</p>
+
+      <div class="rules-grid" style="text-align: left; margin-bottom: 20px;">
+        <div class="rule-card">
+          <div class="rule-icon rule-icon-flag">🚩</div>
+          <div class="rule-text-group">
+            <strong class="rule-step">1. 영토 차지</strong>
+            <p class="rule-detail">내 차례에 빈 타일을 선택하면 영토가 확보됩니다.</p>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-icon rule-icon-bot">🤖</div>
+          <div class="rule-text-group">
+            <strong class="rule-step">2. AI 반격</strong>
+            <p class="rule-detail">플레이어 턴 후 컴퓨터가 지능적으로 맞대응합니다.</p>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-icon rule-icon-crown">🏆</div>
+          <div class="rule-text-group">
+            <strong class="rule-step">3. 승리 조건</strong>
+            <p class="rule-detail">전체 보드가 찼을 때 더 많은 칸을 가진 쪽이 승리!</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="rulesCloseBtn" class="btn btn-primary btn-large">
+          <span class="btn-icon">👍</span> 계속 플레이하기
         </button>
       </div>
     </div>
   </div>
 
   <!-- Result Modal -->
-  <div class="modal-overlay" id="resultModal">
+  <div class="modal-overlay" id="resultModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-card">
       <div class="modal-confetti" id="modalEmoji">🎉</div>
       <h2 class="modal-title" id="modalTitle">축하합니다! 승리!</h2>
@@ -193,9 +265,12 @@
         </div>
       </div>
 
-      <div class="modal-actions">
+      <div class="modal-actions modal-action-stack">
         <button id="modalRestartBtn" class="btn btn-primary btn-large">
-          <span class="btn-icon">🚀</span> 한 판 더 하기!
+          <span class="btn-icon">🔄</span> 한 판 더 하기!
+        </button>
+        <button id="modalHomeBtn" class="btn btn-secondary btn-large">
+          <span class="btn-icon">🏠</span> 인트로 화면으로
         </button>
       </div>
     </div>
