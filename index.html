@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>땅따먹기 배틀! | Player vs AI</title>
+  <meta name="description" content="사용자와 컴퓨터가 펼치는 흥미진진한 실시간 땅따먹기 보드게임! 빈 칸을 차지하고 영토를 넓혀 승리하세요!">
+  
+  <!-- Google Fonts: Fredoka & Jua & Pretendard -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Jua&family=Noto+Sans+KR:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-wrapper">
+    <!-- Header -->
+    <header class="game-header">
+      <div class="logo-area">
+        <span class="logo-icon">🏰</span>
+        <h1 class="game-title">땅따먹기 <span class="highlight">배틀!</span></h1>
+      </div>
+      <div class="header-controls">
+        <button id="soundToggleBtn" class="icon-btn" aria-label="사운드 켜기/끄기" title="소리 켜기/끄기">
+          <span class="icon">🔊</span>
+        </button>
+        <button id="restartBtn" class="btn btn-secondary" title="게임 다시 시작">
+          <span class="btn-icon">🔄</span> 다시 시작
+        </button>
+      </div>
+    </header>
+
+    <!-- Score Board -->
+    <section class="scoreboard-section">
+      <!-- Player Card -->
+      <div class="score-card player-card active" id="playerCard">
+        <div class="avatar-badge">
+          <span class="avatar">👑</span>
+        </div>
+        <div class="score-info">
+          <span class="score-name">나 (플레이어)</span>
+          <div class="score-value-wrapper">
+            <span class="score-count" id="playerScore">0</span>
+            <span class="score-unit">칸</span>
+          </div>
+        </div>
+        <div class="turn-indicator player-turn-tag">내 차례!</div>
+      </div>
+
+      <!-- VS Badge & Board Stats -->
+      <div class="center-stat-board">
+        <div class="vs-badge">VS</div>
+        <div class="remain-tag">
+          남은 땅: <strong id="remainCellsCount">25</strong>칸
+        </div>
+      </div>
+
+      <!-- Computer Card -->
+      <div class="score-card computer-card" id="computerCard">
+        <div class="avatar-badge">
+          <span class="avatar">🤖</span>
+        </div>
+        <div class="score-info">
+          <span class="score-name">컴퓨터 (AI)</span>
+          <div class="score-value-wrapper">
+            <span class="score-count" id="computerScore">0</span>
+            <span class="score-unit">칸</span>
+          </div>
+        </div>
+        <div class="turn-indicator computer-turn-tag">생각 중...</div>
+      </div>
+    </section>
+
+    <!-- Progress Bar (Territory Occupation Rate) -->
+    <div class="progress-bar-container">
+      <div class="progress-fill player-fill" id="playerProgressBar" style="width: 0%;"></div>
+      <div class="progress-fill neutral-fill" id="neutralProgressBar" style="width: 100%;"></div>
+      <div class="progress-fill computer-fill" id="computerProgressBar" style="width: 0%;"></div>
+    </div>
+
+    <!-- Turn Message Banner -->
+    <div class="turn-banner" id="turnBanner">
+      <span class="turn-dot"></span>
+      <span class="turn-message" id="turnText">원하는 빈 칸을 터치하여 땅을 차지하세요! ✨</span>
+    </div>
+
+    <!-- Board Settings & Grid Size Options -->
+    <div class="grid-size-selector">
+      <span class="selector-label">맵 크기:</span>
+      <div class="size-options">
+        <button class="size-btn" data-size="4">4 × 4</button>
+        <button class="size-btn active" data-size="5">5 × 5</button>
+        <button class="size-btn" data-size="6">6 × 6</button>
+      </div>
+    </div>
+
+    <!-- Game Board Container -->
+    <main class="board-wrapper">
+      <div class="board-frame">
+        <div class="game-board" id="gameBoard" style="--grid-size: 5;">
+          <!-- Cells will be generated dynamically by JavaScript -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Guide -->
+    <footer class="game-footer">
+      <p class="guide-text">💡 규칙: 플레이어 점수가 높으면 승리, 낮으면 패배, 같을 때만 무승부로 판정됩니다.</p>
+    </footer>
+  </div>
+
+  <!-- Result Modal -->
+  <div class="modal-overlay" id="resultModal">
+    <div class="modal-card">
+      <div class="modal-confetti" id="modalEmoji">🎉</div>
+      <h2 class="modal-title" id="modalTitle">축하합니다! 승리!</h2>
+      <p class="modal-desc" id="modalDesc">더 많은 영토를 차지하여 승리하셨습니다!</p>
+      
+      <div class="final-score-box">
+        <div class="final-item player-final">
+          <span class="final-label">👑 나의 영토</span>
+          <span class="final-score" id="modalPlayerScore">0칸</span>
+        </div>
+        <div class="final-divider">:</div>
+        <div class="final-item computer-final">
+          <span class="final-label">🤖 컴퓨터 영토</span>
+          <span class="final-score" id="modalComputerScore">0칸</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="modalRestartBtn" class="btn btn-primary btn-large">
+          <span class="btn-icon">🚀</span> 한 판 더 하기!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Canvas for Confetti Fireworks -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <script src="game.js"></script>
+</body>
+</html>
