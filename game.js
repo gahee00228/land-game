@@ -283,6 +283,12 @@ class LandGame {
     this.modalComputerScore = document.getElementById('modalComputerScore');
     this.modalRestartBtn = document.getElementById('modalRestartBtn');
 
+    // Intro & Rules Modal DOM
+    this.introModal = document.getElementById('introModal');
+    this.startGameBtn = document.getElementById('startGameBtn');
+    this.introCloseBtn = document.getElementById('introCloseBtn');
+    this.rulesBtn = document.getElementById('rulesBtn');
+
     // Size Selectors
     this.sizeButtons = document.querySelectorAll('.size-btn');
 
@@ -305,6 +311,35 @@ class LandGame {
       this.closeModal();
       this.startNewGame(this.gridSize);
     });
+
+    // Intro & Rules Modal Events
+    if (this.startGameBtn) {
+      this.startGameBtn.addEventListener('click', () => {
+        this.sound.init();
+        this.sound.playPlayerPop();
+        this.closeIntroModal();
+      });
+    }
+
+    if (this.rulesBtn) {
+      this.rulesBtn.addEventListener('click', () => {
+        this.openIntroModal();
+      });
+    }
+
+    if (this.introCloseBtn) {
+      this.introCloseBtn.addEventListener('click', () => {
+        this.closeIntroModal();
+      });
+    }
+
+    if (this.introModal) {
+      this.introModal.addEventListener('click', (e) => {
+        if (e.target === this.introModal) {
+          this.closeIntroModal();
+        }
+      });
+    }
 
     // Grid Size Selectors
     this.sizeButtons.forEach(btn => {
@@ -522,6 +557,18 @@ class LandGame {
 
   closeModal() {
     this.resultModal.classList.remove('show');
+  }
+
+  openIntroModal() {
+    if (this.introModal) {
+      this.introModal.classList.add('show');
+    }
+  }
+
+  closeIntroModal() {
+    if (this.introModal) {
+      this.introModal.classList.remove('show');
+    }
   }
 }
 
